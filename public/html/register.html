@@ -29,16 +29,22 @@
       <div class="login-div">
         <div class="login-container">
           <div class="login-account-type-text">
-            <h2>Choose Account Type</h2>
+            <h2>Sign Up
+                <a href = "/login"><span class = "logout"><i class="fa-solid fa-right-to-bracket"></i></span></a>
+            </h2>
           </div>
-          <div class="login-account-selection-div">
-            <div class="login-account-img" account = "user">1</div>
-            <div class="login-account-img" account = "staff">2</div>
-            <div class="login-account-img" account = "officer">3</div>
-          </div>
-          <form class="login-form" action = "/login" method = "post">
-            <input type="hidden" name="accountType" id="accountType" value="user" />
+
+          <form class="register-form" action = "/register" method = "post">
             <div class="input-field">
+                <div class="input-element">
+                    <i class="fa-solid fa-user"></i>
+                    <input
+                      class="form-input username"
+                      name="username"
+                      type="text"
+                      placeholder="username"
+                    />
+                </div>
               <div class="input-element">
                 <i class="fa-solid fa-envelope"></i>
                 <input
@@ -46,7 +52,6 @@
                   name="email"
                   type="email"
                   placeholder="email"
-                  required
                 />
               </div>
               <div class="input-element">
@@ -56,28 +61,32 @@
                   name="password"
                   type="password"
                   placeholder="password"
-                  required
                 />
                 </div>
-              <div class="input-element">
-                <button type="submit" class="btn btn-primary btn-md">Log In</button>
-              </div>
-            
+                <div class="input-element">
+                    <i class="fa-solid fa-key"></i>
+                    <input
+                      class="form-input confirmpassword"
+                      name="confirmpassword"
+                      type="password"
+                      placeholder="confirm password"
+                    />
+                </div>
+                <div class="input-element">
+                    <button type="submit" class="btn btn-primary btn-md">Register</button>
+                  </div>
+            </div>
           </form>
           <div class="or-divider">
             <hr><span>or</span><hr>
         </div>
         <div class="google-login">
-            <button class="btn btn-sm">
+            <button type = "submit" class="btn btn-sm">
                 <i class="fa-brands fa-google"></i>
                 <span>Sign in with Google</span>
             </button>
         </div>
-        <div class="create-account">
-            <p>New User? <a href="/register">Create Account</a></p>
         </div>
-        </div>
-        
       </div>
     </div>
   </body>
@@ -90,19 +99,4 @@
     src="https://kit.fontawesome.com/e95a92cdc1.js"
     crossorigin="anonymous"
   ></script>
-  <script>
-        var account_types_img = document.querySelectorAll(".login-account-img");
-        account_types_img[0].classList.add("selected");
-        for(var i = 0 ; i < account_types_img.length ; i++){
-            account_types_img[i].addEventListener('click' , function(){
-                for(var j = 0 ; j < account_types_img.length ; j++){
-                    account_types_img[j].classList.remove("selected");
-                }
-                this.classList.add('selected');
-                var account_input_form = document.getElementById('accountType');
-                account_input_form.setAttribute("value" , this.getAttribute("account"));
-                console.log(account_input_form);
-            });
-        }
-  </script>
 </html>

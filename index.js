@@ -6,6 +6,7 @@ import bcrypt from "bcrypt";
 import session from "express-session";
 import passport from "passport";
 import {Strategy} from "passport-local";
+import GoogleStrategy from "passport-google-oauth2";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
 const port = 4000;
@@ -13,14 +14,14 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
  
 app.use(session({
-    secret : "this-is-secret-string-used-to-encrypt",
+    secret : "",
     resave: false,
     saveUninitialized : true,
     cookie : {maxAge : 1000*60*60*24}
 }));
 app.use(passport.initialize());
 app.use(passport.session());
-
+app.set('view engine', 'ejs');
 const saltRounds = 10;
 const db = new pg.Client({
     user: "postgres",
@@ -30,7 +31,14 @@ const db = new pg.Client({
     port: 5432,
   });
   db.connect();
-
+app.get("/u/services" ,async (req , res)=>{
+    try{
+        const result = await db.query("select * from services_details");
+        console.log(result.rows);
+        res.render("user/applyservices" , {services : result.rows});
+    }
+    catch(e){console.log("Error fetching service data");}
+});
 app.get("/login" ,(req , res)=>{
     res.sendFile(__dirname + "/public/html/login.html");
 })
@@ -130,7 +138,16 @@ app.get("/logout", (req, res) => {
     });
   });
 
-passport.use(new Strategy(
+app.get("/auth/google" , passport.authenticate("google" , {
+    scope : ["profile" , "email"]
+}));
+
+app.get("/auth/google/secrets" , passport.authenticate("google" , {
+    successRedirect : "/secrets",
+    failureRedirect : "/login"
+}));
+
+passport.use("local" , new Strategy(
     { usernameField: 'email',
         passwordField: 'password',
         passReqToCallback: true
@@ -166,6 +183,35 @@ passport.use(new Strategy(
         console.log(err);
     }
 }));
+
+// Google OAuth 
+
+passport.use("google" , new GoogleStrategy({                                   // Give a name to it here we have given it google
+    clientID : "",                                     // Your google project ID created
+    clientSecret : "",                             // Your google project secret created
+    callbackURL : "http://localhost:4000/auth/google/secrets",                   // Where it will redirect to after success
+    userProfileURL : "https://www.googleapis.com/oauth2/v3/userinfo"             // used to fetch the user info as access token
+    } , async(accessToken, refreshToken, profile, callback)=>{             // Callback function which will called once the process succeeds.
+          console.log(profile);
+          try{
+            const currDate = new Date().toISOString().split('T')[0];
+            const result = await db.query("select * from account_details where email = $1 and account_type = $2" , [profile.email , "user"]);
+            if(result.rows.length == 0){
+              const newUser = await db.query("insert into account_details(name , email , password , account_type , creation_date) values($1,$2,$3,$4,$5)" , [profile.displayName, profile.email, "google", "user" , currDate]);
+              callback(null , newUser.rows[0]);
+            }
+            else{
+              // Already exists 
+              callback(null , result.rows[0]);
+            }
+          }
+          catch(err){
+            callback(err);
+          }
+        }
+  ));
+
+
 passport.serializeUser((user , callback)=>{
     callback(null , user);
   });
@@ -175,3 +221,20 @@ passport.serializeUser((user , callback)=>{
 app.listen(port,()=>{
     console.log("Server is up and running on port " + port);
 });
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+    While clicking the sign with google button with the form get automatically filled was causing the form submission triggered using local strategy // It means that the form was getting submitted and not google authentication was done
+    To resolve this make the button type from default/submit to button beacause the button's default type is submit and it might cause form submission even if the button is outsid the form. Second way is to use event.preventDefault();
+    windows.location.href = '/something' can be used to redirect using JS.
+*/

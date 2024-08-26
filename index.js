@@ -7,6 +7,7 @@ import session from "express-session";
 import passport from "passport";
 import {Strategy} from "passport-local";
 import GoogleStrategy from "passport-google-oauth2";
+import env from 'dotenv'
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
 const port = 4000;
@@ -389,8 +390,8 @@ passport.use("local" , new Strategy(
 // Google OAuth 
 
 passport.use("google" , new GoogleStrategy({                                   // Give a name to it here we have given it google
-    clientID : "",                                     // Your google project ID created
-    clientSecret : "",                             // Your google project secret created
+    clientID : "31323677969-99g04p9rbontisgqrbkejf4v3l3e33it.apps.googleusercontent.com",                                     // Your google project ID created
+    clientSecret : "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",                             // Your google project secret created
     callbackURL : "http://localhost:4000/auth/google/secrets",                   // Where it will redirect to after success
     userProfileURL : "https://www.googleapis.com/oauth2/v3/userinfo"             // used to fetch the user info as access token
     } , async(accessToken, refreshToken, profile, callback)=>{             // Callback function which will called once the process succeeds.

@@ -391,8 +391,8 @@ passport.use("local" , new Strategy(
 // Google OAuth 
 
 passport.use("google" , new GoogleStrategy({                                   // Give a name to it here we have given it google
-    clientID : "31323677969-99g04p9rbontisgqrbkejf4v3l3e33it.apps.googleusercontent.com",                                     // Your google project ID created
-    clientSecret : "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",                             // Your google project secret created
+    clientID : process.env.GOOGLE_CLIENT_ID,                                     // Your google project ID created
+    clientSecret : process.env.GOOGLE_CLIENT_SECRET,                             // Your google project secret created
     callbackURL : "http://localhost:4000/auth/google/secrets",                   // Where it will redirect to after success
     userProfileURL : "https://www.googleapis.com/oauth2/v3/userinfo"             // used to fetch the user info as access token
     } , async(accessToken, refreshToken, profile, callback)=>{             // Callback function which will called once the process succeeds.

@@ -41,7 +41,7 @@ app.use(express.static("public"));
 app.use(express.json());
 
 app.use(session({
-    secret : "",
+    secret : "this-is-secret-string-used-to-encrypt",
     resave: false,
     saveUninitialized : true,
     cookie : {maxAge : 1000*60*60*24}
@@ -51,11 +51,11 @@ app.use(passport.session());
 app.set('view engine', 'ejs');
 const saltRounds = 10;
 const db = new pg.Client({
-    user: "postgres",
-    host: "localhost",
-    database: "EGP",
-    password: "Anuj@123",
-    port: 5432,
+    user: process.env.POSTGRES_USER,
+    host: process.env.POSTGRES_HOST,
+    database: process.env.POSTGRES_DATABASE,
+    password: process.env.POSTGRES_PASSWORD,
+    port: process.env.POSTGRES_PORT,
   });
   db.connect();
 app.get("/u/services" ,async (req , res)=>{
